@@ -1,4 +1,3 @@
-
 subroutine sor(nr,ntheta,acerr,peinv,dt,dthetainv,rs,thetas,dr3inv,drinv,dsinv,c,adv,coef)
     implicit none
     integer :: nr,ntheta
@@ -13,27 +12,27 @@ subroutine sor(nr,ntheta,acerr,peinv,dt,dthetainv,rs,thetas,dr3inv,drinv,dsinv,c
 
     double precision :: adv(-1:nr,0:ntheta-1)
     double precision :: coef(0:nr-1,0:ntheta-1)
-    double precision :: omega,dtinv
+    double precision :: omega
 
-    double precision :: err,diff,l2err
+    double precision :: err,diff,l2err,dr
     double precision :: dc(0:nr-1,0:ntheta-1)
     integer :: i,j,k,MAX,mid
+    double precision :: cp1,cm1,aw,ae,as,an
 
     double precision :: acerr
     MAX = nr*ntheta*4
     ! acerr = 1.d-9
-    omega=1.0d0
-dtinv=1.0d0/dt
+    omega = 0.8d0
 
 !$OMP  PARALLEL DO &
 !$OMP& SCHEDULE(static,1) &
 !$OMP& DEFAULT(SHARED) &
 !$OMP& PRIVATE(i,j)
-do j = 0, ntheta-1
-    do i = -1, nr
-        pc(i,j)=c(i,j)
-    end do
-end do
+    do j = 0,ntheta-1
+        do i = -1,nr
+            pc(i,j) = c(i,j)
+        enddo
+    enddo
 !$OMP  END PARALLEL DO
 
     do k = 1,MAX
@@ -42,83 +41,66 @@ end do
 !$OMP  PARALLEL DO &
 !$OMP& SCHEDULE(static,1) &
 !$OMP& DEFAULT(SHARED) &
-!$OMP& PRIVATE(i,j,diff) &
-!$OMP& REDUCTION(+:err)
-        do j = 1,ntheta-2
+!$OMP& PRIVATE(i,j,diff,dr,cm1,cp1,aw,ae,as,an)
+        do j = 0,ntheta-1
             do i = 0,nr-1
-                diff = 2.0d0*peinv*dr3inv(i)* &
-                    & ((-(rs(i)**2)*(-pc(i-1,j)+pc(i,j))*drinv(i)+(rs(i+1)**2)*(-pc(i,j)+pc(i+1,j))*drinv(i+1))+ &
-                    & dsinv(j)*dthetainv*(-sin(thetas(j))*(-pc(i,j-1)+pc(i,j))+sin(thetas(j+1))*(-pc(i,j)+pc(i,j+1))))
-                dc(i,j) = coef(i,j)*((pc(i,j)-c(i,j))*dtinv +adv(i,j) - diff)
-! pc(i,j) = pc(i,j)+omega*dc(i,j)
+
+                if(j.ge.1) then
+                    cm1 = c(i,j-1)
+                else
+                    cm1 = c(i,j)
+                endif
+                if(j.le.ntheta-2) then
+                    cp1 = c(i,j+1)
+                else
+                    cp1 = c(i,j)
+                endif
+                dr = rs(i+1)-rs(i)
+                ! adv = dr3inv(i)*dsinv(j)*0.5d0*( &
+                !     ((-c(i-1,j)+c(i,j))*ur(i,j)+(-c(i,j)+c(i+1,j))*ur(i+1,j)) &
+                !     +((-cm1+c(i,j))*uw(i,j)+(-c(i,j)+cp1)*uw(i,j+1)) &
+                !     )
+
+                aw = dr3inv(i)*rs(i)**2*drinv(i)
+                ae = dr3inv(i)*rs(i+1)**2*drinv(i+1)
+                as = dr3inv(i)*dr*dsinv(j)*sin(thetas(j))*dthetainv
+                an = dr3inv(i)*dr*dsinv(j)*sin(thetas(j+1))*dthetainv
+
+                diff = 2.0d0*peinv*( &
+                       +aw*(c(i-1,j)-c(i,j)) &
+                       +ae*(c(i+1,j)-c(i,j)) &
+                       +as*(cm1-c(i,j)) &
+                       +an*(cp1-c(i,j)) &
+                       )
+                dc(i,j) = coef(i,j)*(pc(i,j)-c(i,j)+dt*(adv(i,j)-diff))
+                pc(i,j) = pc(i,j)-omega*dc(i,j)
                 err = err+dc(i,j)**2
             enddo
         enddo
 !$OMP  END PARALLEL DO
 
-
-! !$OMP  PARALLEL DO &
-! !$OMP& SCHEDULE(static,1) &
-! !$OMP& DEFAULT(SHARED) &
-! !$OMP& PRIVATE(i,j,diff) &
-! !$OMP& REDUCTION(+:err)
-!         do i = 0,nr-1
-!             j = 0
-!             diff = 2.0d0*peinv*dr3inv(i)* &
-!                 & ((-(rs(i)**2)*(-c(i-1,j)+c(i,j))*drinv(i)+(rs(i+1)**2)*(-c(i,j)+c(i+1,j))*drinv(i+1))+ &
-!                 & dsinv(j)*dthetainv*(sin(thetas(j+1))*(-c(i,j)+c(i,j+1))))
-!             dc(i,j) = coef(i,j)*((pc(i,j)-c(i,j))*dtinv +adv(i,j) - diff)
-! ! c(i,j) = c(i,j)+omega*dc(i,j)
-!             err = err+dc(i,j)**2
-!             ! err = max(err,abs(dc(i,j)))
-
-!             j = ntheta-1
-!             diff = 2.0d0*peinv*dr3inv(i)* &
-!                 & ((-(rs(i)**2)*(-c(i-1,j)+c(i,j))*drinv(i)+(rs(i+1)**2)*(-c(i,j)+c(i+1,j))*drinv(i+1))+ &
-!                 & dsinv(j)*dthetainv*(-sin(thetas(j))*(-c(i,j-1)+c(i,j))))
-!             dc(i,j) = coef(i,j)*((pc(i,j)-c(i,j))*dtinv +adv(i,j) - diff)
-! ! c(i,j) = c(i,j)+omega*dc(i,j)
-!             err = err+dc(i,j)**2
-!             ! err = max(err,abs(dc(i,j)))
-!         enddo
-! !$OMP  END PARALLEL DO
-
-!$OMP  PARALLEL DO &
-!$OMP& SCHEDULE(static,1) &
-!$OMP& DEFAULT(SHARED) &
-!$OMP& PRIVATE(i,j)
-        do j = 0,ntheta-1
-            do i = 0,nr-1
-                pc(i,j) = pc(i,j)-omega*dc(i,j)
-            enddo
-        enddo
-
-!$OMP  END PARALLEL DO
-
         l2err = sqrt(err/dble(ntheta*nr))
-        ! if(mod(k,10)==0) then
+        ! if(mod(k,100)==0) then
         !     write(*,*) k,l2err
         ! endif
-            write(*,*) k,l2err
 
         if(l2err<acerr) then
-            write(*,*) 'SOR roop',k
+            ! write(*,*) 'SOR roop',k
             exit
         endif
 
     enddo
-    ! write(*,*) 'SOR roop end --------------'
 
 !$OMP  PARALLEL DO &
 !$OMP& SCHEDULE(static,1) &
 !$OMP& DEFAULT(SHARED) &
 !$OMP& PRIVATE(i,j)
-do j = 0, ntheta-1
-    do i = -1, nr
-        c(i,j)=pc(i,j)
-    end do
-end do
+    do j = 0,ntheta-1
+        do i = -1,nr
+            c(i,j) = pc(i,j)
+        enddo
+    enddo
 !$OMP  END PARALLEL DO
 
-    stop
+    ! stop
 endsubroutine sor

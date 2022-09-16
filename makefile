@@ -12,8 +12,6 @@ cal_sh.f90  		\
 cal_thetas.f90		\
 cal_vel.f90			\
 cal_xs_ys.f90 		\
-update.f90			\
-sor.f90			\
 sor2.f90			\
 main.f90            \
 
