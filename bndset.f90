@@ -1,8 +1,9 @@
-subroutine bndset(nr,ntheta,alpha,alphainv,c)
+! subroutine bndset(nr,ntheta,alpha,alphainv,c)
+subroutine bndset(nr,ntheta,c)
     implicit none
     integer :: nr,ntheta
     double precision :: c(-1:nr,0:ntheta-1)
-    double precision :: alphainv,alpha
+    ! double precision :: alphainv,alpha
     integer :: j
 
 !$OMP  PARALLEL DO &
@@ -10,9 +11,10 @@ subroutine bndset(nr,ntheta,alpha,alphainv,c)
 !$OMP& DEFAULT(SHARED) &
 !$OMP& PRIVATE(j)
     do j = 0,ntheta-1
-        c(-1,j) = (1.0d0-c(0,j))*alphainv+1.0d0
-        ! c(nr,j) = -c(nr-1,j)
-        c(nr,j) = -alpha*c(nr-1,j)
+        c(-1,j) = 2.0d0-c(0,j)
+        c(nr,j) = -c(nr-1,j)
+        ! c(-1,j) = (1.0d0-c(0,j))*alphainv+1.0d0
+        ! c(nr,j) = -alpha*c(nr-1,j)
     enddo
 !$OMP  END PARALLEL DO
 

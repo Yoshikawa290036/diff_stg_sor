@@ -72,7 +72,7 @@ program main
     !     enddo
     ! enddo
 
-    call bndset(nr,ntheta,alpha,alphainv,c)
+    call bndset(nr,ntheta,c)
     include'mk_xyc.h'
     call cal_vel(nr,ntheta,lambda,xs,ys,rs,thetas,ur,uw)
     call cal_sh(nr,ntheta,drmininv,dtheta,thetas,c,sh)
@@ -82,7 +82,7 @@ program main
     write(12,'(20e20.10)') time,dt,sh
 
     do nstep = 1,max_step
-        call bndset(nr,ntheta,alpha,alphainv,c)
+        call bndset(nr,ntheta,c)
         call cal_adv(nr,ntheta,peinv,rs,thetas,drinv,dr3inv,dsinv,dthetainv,ur,uw,c,adv)
         call sor(nr,ntheta,acerr,peinv,dt,dthetainv,rs,thetas,dr3inv,drinv,dsinv,c,adv,coef)
         ! stop
