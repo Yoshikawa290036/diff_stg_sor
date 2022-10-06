@@ -18,12 +18,15 @@ $$\lambda=\dfrac{3\kappa+2}{4\kappa+4}.$$
 
 
 球座標系における，無次元化された物質濃度 $C$ の輸送方程式は，以下のように書き表される．
-$$\dfrac{\partial C}{\partial t}+u_r \dfrac{\partial C}{\partial r}+\dfrac{u_\theta}{r}\dfrac{\partial C}{\partial \theta}=\dfrac{2}{Pe}\left\{\dfrac{1}{r^2}\dfrac{\partial }{\partial r}\left(r^2 \dfrac{\partial C}{\partial r}\right) + \dfrac{1}{r^2\sin{\theta}}\dfrac{\partial }{\partial \theta}\left(\sin{\theta} \dfrac{\partial C}{\partial \theta}\right)\right\},$$
+$$\dfrac{\partial C}{\partial t}+u_r \dfrac{\partial C}{\partial r}+\dfrac{u_\theta}{r}\dfrac{\partial C}{\partial \theta}=\dfrac{2}{Pe}\left[\dfrac{1}{r^2}\dfrac{\partial }{\partial r}\left(r^2 \dfrac{\partial C}{\partial r}\right) + \dfrac{1}{r^2\sin{\theta}}\dfrac{\partial }{\partial \theta}\left(\sin{\theta} \dfrac{\partial C}{\partial \theta}\right)\right],$$
 ここで，ペクレ数 $Pe$ の代表長さは球の直径である．無次元化された物質濃度 $C$ は，球表面で $1$ ，球から十分遠方で $0$ とした．
 計算領域の最大半径 $R_{max}$ として，境界条件は以下のように書き表される．
-$$C=1           \text{at}         r=1, $$
-$$C =0          \text{at}         r=R_{max},$$
-$$\dfrac{\partial C}{\partial \theta} =0        \text{at}     \theta=0\;\text{and}\;\pi.$$
+
+$C=1$         at         $r=1$,
+
+$C =0$        at         $r=R_{max}$,
+
+$\dfrac{\partial C}{\partial \theta} =0$  at     $\theta=0\;\text{and}\;\pi.$
 
 対流項は陽的に、拡散項は陰的(SOR法)に解く。
 
