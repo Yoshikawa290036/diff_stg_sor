@@ -13,8 +13,8 @@ $$\psi = \dfrac{r^2 \sin^2{\theta}}{2} \left(1-\dfrac{2\lambda}{r}+ \dfrac{2\lam
 $$\lambda=\dfrac{3\kappa+2}{4\kappa+4}.$$
 
 速度の半径方向成分 $u_r$ ，周方向成分 $u_\theta$ は，以下のように書き表される．
-$$ u_r=\dfrac{1}{r^2\sin{\theta}}\dfrac{\partial \psi}{\partial \theta}=\cos{\theta}\left(1-\dfrac{2\lambda}{r}+\dfrac{2\lambda-1}{r^3}\right),$$
-$$ u_\theta=-\dfrac{1}{r\sin{\theta}}\dfrac{\partial \psi}{\partial r}=\sin{\theta}\left(-1+\dfrac{\lambda}{r}+\dfrac{2\lambda-1}{2r^3}\right).$$
+ $$ u_r=\dfrac{1}{r^2\sin{\theta}}\dfrac{\partial \psi}{\partial \theta}=\cos{\theta}\left(1-\dfrac{2\lambda}{r}+\dfrac{2\lambda-1}{r^3}\right),$$
+ $$ u_\theta=-\dfrac{1}{r\sin{\theta}}\dfrac{\partial \psi}{\partial r}=\sin{\theta}\left(-1+\dfrac{\lambda}{r}+\dfrac{2\lambda-1}{2r^3}\right).$$
 
 
 球座標系における，無次元化された物質濃度 $C$ の輸送方程式は，以下のように書き表される．
