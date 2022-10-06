@@ -26,7 +26,7 @@ $C=1$         at         $r=1$,
 
 $C =0$        at         $r=R_{max}$,
 
-$\dfrac{\partial C}{\partial \theta} =0$  at     $\theta=0\;\text{and}\;\pi.$
+$\dfrac{\partial C}{\partial \theta} =0$  at     $\theta=0,\pi.$
 
 対流項は陽的に、拡散項は陰的(SOR法)に解く。
 
